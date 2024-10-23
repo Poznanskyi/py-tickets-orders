@@ -3,14 +3,7 @@ from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
 
 from cinema.filters import FilterMovieSessionByDateAndMovie, FilterMovieViewSet
-from cinema.models import (
-    Genre,
-    Actor,
-    CinemaHall,
-    Movie,
-    MovieSession,
-    Order
-)
+from cinema.models import Genre, Actor, CinemaHall, Movie, MovieSession, Order
 from cinema.serializers import (
     GenreSerializer,
     ActorSerializer,
@@ -22,7 +15,7 @@ from cinema.serializers import (
     MovieSessionDetailSerializer,
     MovieListSerializer,
     OrderSerializer,
-    OrderListSerializer
+    OrderListSerializer,
 )
 
 
@@ -78,13 +71,19 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
 
         if self.action == "list":
             queryset = (
-                queryset
-                .select_related("cinema_hall", "movie")
+                queryset.select_related("cinema_hall", "movie")
                 .prefetch_related("tickets")
                 .annotate(
-                    tickets_available=(F("cinema_hall__rows") * F(
-                        "cinema_hall__seats_in_row")) - Count("tickets")
-                ).order_by("id")
+                    tickets_available=(
+                        F("cinema_hall__rows") * F("cinema_hall__seats_in_row")
+                    )
+                    - Count("tickets")
+                )
+                .order_by("id")
+            )
+        elif self.action == "retrieve":
+            queryset = queryset.select_related("cinema_hall", "movie").prefetch_related(
+                "tickets"
             )
 
         return queryset
@@ -105,12 +104,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        query_set = self.queryset.select_related(
-            "user"
-        ).prefetch_related(
-            "tickets__movie_session__cinema_hall",
-            "tickets__movie_session__movie"
-        )
+        query_set = self.queryset.select_related("user")
 
         if self.action == "list":
             query_set = query_set.filter(user=self.request.user)
