@@ -8,7 +8,10 @@ from cinema.models import MovieSession, Movie
 
 class FilterMovieSessionByDateAndMovie(filters.BaseFilterBackend):
     def filter_queryset(
-        self, request: HttpRequest, queryset: QuerySet[MovieSession], view: ModelViewSet
+            self,
+            request: HttpRequest,
+            queryset: QuerySet[MovieSession],
+            view: ModelViewSet
     ) -> QuerySet[MovieSession]:
         date = request.query_params.get("date")
         movie = request.query_params.get("movie")
@@ -23,7 +26,10 @@ class FilterMovieSessionByDateAndMovie(filters.BaseFilterBackend):
 
 class FilterMovieViewSet(filters.BaseFilterBackend):
     def filter_queryset(
-        self, request: HttpRequest, queryset: QuerySet[Movie], view: ModelViewSet
+            self,
+            request: HttpRequest,
+            queryset: QuerySet[Movie],
+            view: ModelViewSet
     ):
         actors = request.query_params.get("actors")
         genres = request.query_params.get("genres")

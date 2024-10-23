@@ -82,7 +82,10 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
                 .order_by("id")
             )
         elif self.action == "retrieve":
-            queryset = queryset.select_related("cinema_hall", "movie").prefetch_related(
+            queryset = queryset.select_related(
+                "cinema_hall",
+                "movie"
+            ).prefetch_related(
                 "tickets"
             )
 
